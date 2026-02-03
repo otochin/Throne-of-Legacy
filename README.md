@@ -69,6 +69,13 @@ Verseコードのデバッグは、UEFNエディタ内で実行中のゲーム�
 
 デバッグ設定は `.vscode/launch.json` に含まれています。
 
+## テストガイド
+
+Phase 1の動作テストを行う場合は、以下のガイドを参照してください：
+
+- **[Phase 1 テストガイド](docs/PHASE1_TESTING_GUIDE.md)** - テスト手順の概要
+- **[UEFN セットアップ詳細手順](docs/UEFN_SETUP_STEPS.md)** - 詳細な操作手順
+
 ## 参考リンク
 
 - [Epic Games UEFN Documentation](https://dev.epicgames.com/documentation/en-us/uefn)

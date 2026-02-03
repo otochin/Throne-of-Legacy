@@ -346,11 +346,11 @@ save_data := class:
 ## 7. 実装チェックリスト
 
 ### Phase 1: 王室の財政
-- [ ] `player_data` クラスの実装
-- [ ] Mutator Zoneデバイスの実装
-- [ ] ゴールド生成ロジックの実装
-- [ ] 基本HUDの実装
-- [ ] ゴールド獲得VFX/サウンドの実装
+- [x] `player_data` クラスの実装 (`Content/Systems/player_data.verse`)
+- [x] Mutator Zoneデバイスの実装 (`Content/Devices/throne_zone_device.verse`)
+- [x] ゴールド生成ロジックの実装 (`Content/Systems/economy_system.verse`)
+- [x] 基本HUDの実装 (`Content/UI/hud_ui.verse`)
+- [x] ゴールド獲得VFX/サウンドの実装 (`Content/Systems/vfx_sound_system.verse`)
 
 ### Phase 2: 国土の復興
 - [ ] Conditional Buttonデバイスの実装

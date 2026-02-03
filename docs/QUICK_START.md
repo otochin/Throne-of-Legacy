@@ -2,6 +2,20 @@
 
 このドキュメントは、新しいチャットセッションで開発を開始する際に参照すべき順序とポイントをまとめています。
 
+---
+
+## ⚠️ 最初に参照すること：UEFN Verse
+
+**開発を進める前に、必ず UEFN Verse の公式ドキュメントを参照してください。**
+
+- **[Verse API Reference](https://dev.epicgames.com/documentation/ja-jp/uefn/verse-api-reference)**（Verse API リファレンス）
+- [Verse Language Reference](https://dev.epicgames.com/documentation/en-us/uefn/verse-language-reference-in-unreal-editor-for-fortnite)（Verse 言語リファレンス）
+- [UEFN Documentation](https://dev.epicgames.com/documentation/en-us/uefn)（UEFN ドキュメント）
+
+Verse の構文・型・API は公式仕様に従い、実装やコード生成時は上記ドキュメントを優先して参照すること。
+
+---
+
 ## 📋 推奨参照順序
 
 ### 1. **`docs/DEVELOPMENT_LOG.md`** （最重要・最初に確認）
@@ -76,6 +90,27 @@
 2. 実装する機能に関連するセクションを確認
 3. データ構造やロジックの詳細を確認
 ```
+
+---
+
+## ⚠️ コンパイルエラーとUEFN側オブジェクトの関係
+
+**コンパイルエラーが出ている場合**
+- **Verse のコンパイルエラーは、コード（.verse ファイル）の修正で解消します。**
+- UEFN のレベルに Mutator Zone や Verse Device を置いても、**スクリプトのコンパイルエラーは消えません**。
+- コンパイラは .verse の構文・型・API だけを見ており、レベル上に何があるかは見ていません。
+
+**コンパイルが通ったあと**
+- **その時点で**、UEFN エディタ側でオブジェクトを用意する必要があります。
+- 例：
+  - **Verse Device** をレベルに配置し、Verse File（例: `throne_zone_device.verse`）と Device Class（例: `throne_zone_device`）を指定する。
+  - **Mutator Zone** を配置し、必要なら Verse Device から参照する（`@editable` でデバイスに Mutator Zone を渡す場合）。
+- 詳細な手順は **`docs/UEFN_SETUP_STEPS.md`** にあります。
+
+| 状況 | 対処 |
+|------|------|
+| まだコンパイルエラーが出る | Verse コードを修正する（型・構文・API の見直し） |
+| コンパイルは通るがゲームで動かない | UEFN で Verse Device / Mutator Zone などを配置し、`UEFN_SETUP_STEPS.md` の手順を実施する |
 
 ---
 

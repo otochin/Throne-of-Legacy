@@ -167,10 +167,10 @@ player_data := class:
 **開発目標**: 自動ゴールド生成、基本HUDの実装
 
 **具体的なVerseタスク**:
-- [ ] プレイヤーデータ管理クラス (`player_data`) の作成
-- [ ] Mutator Zoneでの滞在時間報酬システムの実装
-- [ ] ゴールド表示用のHUD実装
-- [ ] ゴールド獲得時のVFX/サウンド実装
+- [x] プレイヤーデータ管理クラス (`player_data`) の作成 (`Content/Systems/player_data.verse`)
+- [x] Mutator Zoneでの滞在時間報酬システムの実装 (`Content/Devices/throne_zone_device.verse`)
+- [x] ゴールド表示用のHUD実装 (`Content/UI/hud_ui.verse`)
+- [x] ゴールド獲得時のVFX/サウンド実装 (`Content/Systems/vfx_sound_system.verse`)
 
 ### Phase 2: 国土の復興
 **開発目標**: ボタン購入システム、建築物の表示/非表示制御
