@@ -7,99 +7,135 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 # このモジュールは、プレイヤーごとのゲームデータを管理します。
 # 経済データ、RPGデータ、ステータスデータなどを統合的に管理します。
 
-# バフデータ
-buff_data := class:
-    var buff_type : int = 0  # 0: Attack, 1: Speed, 2: HP Regen, 3: Defense, 4: Critical
-    var buff_value : int = 0  # バフの値（パーセンテージまたは固定値）
-    var duration : float = 0.0  # 持続時間（秒）、0.0は永続
-    var start_time : float = 0.0  # 開始時刻
+# バフデータ（永続化可能なクラス）
+buff_data := class<final><persistable>:
+    buff_type : int = 0  # 0: Attack, 1: Speed, 2: HP Regen, 3: Defense, 4: Critical
+    buff_value : int = 0  # バフの値（パーセンテージまたは固定値）
+    duration : float = 0.0  # 持続時間（秒）、0.0は永続
+    start_time : float = 0.0  # 開始時刻
 
-# プレイヤーデータ。すべてのプレイヤー関連データを保持
-player_data := class:
+# プレイヤーデータ。すべてのプレイヤー関連データを保持（永続化可能なクラス）
+player_data := class<final><persistable>:
+    # バージョン管理（スキーマ変更時の互換性確認用）
+    Version : int = 1
+    
     # 経済データ
-    var gold : int = 0
-    var total_gold_earned : int = 0
+    gold : int = 0
+    total_gold_earned : int = 0
     
     # RPGデータ
-    var level : int = 1
-    var experience : int = 0
-    var experience_to_next_level : int = 100
+    level : int = 1
+    experience : int = 0
+    experience_to_next_level : int = 100
     
     # ステータスデータ
-    var max_hp : int = 100
-    var current_hp : int = 100
-    var base_attack : int = 10
-    var base_defense : int = 5
-    var base_speed : int = 100
+    max_hp : int = 100
+    current_hp : int = 100
+    base_attack : int = 10
+    base_defense : int = 5
+    base_speed : int = 100
     
     # クラスデータ
     # 0: Knight, 1: Mage, 2: Hunter
-    var player_class : int = 0
+    player_class : int = 0
     
     # 建設データ
-    var unlocked_buildings : []int = array{}
+    unlocked_buildings : []int = array{}
     
     # バフデータ
-    var active_buffs : []buff_data = array{}
+    active_buffs : []buff_data = array{}
     
     # タイムスタンプ
-    var last_gold_update_time : float = 0.0
-    
-    # ゴールドを追加する関数
-    AddGold(amount : int):void =
-        if (amount > 0) {
-            set gold += amount
-            set total_gold_earned += amount
-        } else {}
-    
-    # ゴールドを消費する関数
-    SpendGold(amount : int):logic =
-        if (gold >= amount and amount > 0) {
-            set gold -= amount
-            true
-        } else false
-    
-    # ゴールドを取得する関数
-    GetGold():int =
-        gold
-    
-    # HPを回復する関数
-    HealHP(amount : int):void =
-        set current_hp = Min(current_hp + amount, max_hp)
-    
-    # ダメージを受ける関数
-    TakeDamage(amount : int):void =
-        set current_hp = Max(current_hp - amount, 0)
-    
-    # 現在HPを取得する関数
-    GetCurrentHP():int =
-        current_hp
-    
-    # 最大HPを取得する関数
-    GetMaxHP():int =
-        max_hp
-    
-    # レベルを取得する関数
-    GetLevel():int =
-        level
-    
-    # 経験値を追加する関数
-    AddExperience(amount : int):void =
-        if (amount > 0) {
-            set experience += amount
-            # レベルアップチェックは別の関数で処理
-        } else {}
-    
-    # 経験値を取得する関数
-    GetExperience():int =
-        experience
-    
-    # 次のレベルに必要な経験値を取得する関数
-    GetExperienceToNextLevel():int =
-        experience_to_next_level
+    last_gold_update_time : float = 0.0
 
-# プレイヤーデータ管理用のグローバルマップ（値型は persistable である必要あり）
-var player_data_map : map(player, player_data) = map{}
+# --- player_data 用ユーティリティ関数 ---
+
+# ゴールドを追加した新しい player_data を返す
+AddGoldToPlayerData(data : player_data, amount : int):player_data =
+    if (amount > 0) {
+        player_data{
+            Version := data.Version,
+            gold := data.gold + amount,
+            total_gold_earned := data.total_gold_earned + amount,
+            level := data.level,
+            experience := data.experience,
+            experience_to_next_level := data.experience_to_next_level,
+            max_hp := data.max_hp,
+            current_hp := data.current_hp,
+            base_attack := data.base_attack,
+            base_defense := data.base_defense,
+            base_speed := data.base_speed,
+            player_class := data.player_class,
+            unlocked_buildings := data.unlocked_buildings,
+            active_buffs := data.active_buffs,
+            last_gold_update_time := data.last_gold_update_time
+        }
+    } else {
+        data
+    }
+
+# ダメージを受けた新しい player_data を返す
+TakeDamageOnPlayerData(data : player_data, amount : int):player_data =
+    player_data{
+        Version := data.Version,
+        gold := data.gold,
+        total_gold_earned := data.total_gold_earned,
+        level := data.level,
+        experience := data.experience,
+        experience_to_next_level := data.experience_to_next_level,
+        max_hp := data.max_hp,
+        current_hp := Max(data.current_hp - amount, 0),
+        base_attack := data.base_attack,
+        base_defense := data.base_defense,
+        base_speed := data.base_speed,
+        player_class := data.player_class,
+        unlocked_buildings := data.unlocked_buildings,
+        active_buffs := data.active_buffs,
+        last_gold_update_time := data.last_gold_update_time
+    }
+
+# HPを回復した新しい player_data を返す
+HealPlayerData(data : player_data, amount : int):player_data =
+    player_data{
+        Version := data.Version,
+        gold := data.gold,
+        total_gold_earned := data.total_gold_earned,
+        level := data.level,
+        experience := data.experience,
+        experience_to_next_level := data.experience_to_next_level,
+        max_hp := data.max_hp,
+        current_hp := Min(data.current_hp + amount, data.max_hp),
+        base_attack := data.base_attack,
+        base_defense := data.base_defense,
+        base_speed := data.base_speed,
+        player_class := data.player_class,
+        unlocked_buildings := data.unlocked_buildings,
+        active_buffs := data.active_buffs,
+        last_gold_update_time := data.last_gold_update_time
+    }
+
+# last_gold_update_time を更新した新しい player_data を返す
+SetLastGoldUpdateTime(data : player_data, new_time : float):player_data =
+    player_data{
+        Version := data.Version,
+        gold := data.gold,
+        total_gold_earned := data.total_gold_earned,
+        level := data.level,
+        experience := data.experience,
+        experience_to_next_level := data.experience_to_next_level,
+        max_hp := data.max_hp,
+        current_hp := data.current_hp,
+        base_attack := data.base_attack,
+        base_defense := data.base_defense,
+        base_speed := data.base_speed,
+        player_class := data.player_class,
+        unlocked_buildings := data.unlocked_buildings,
+        active_buffs := data.active_buffs,
+        last_gold_update_time := new_time
+    }
+
+# プレイヤーデータ管理用のグローバルマップ（永続化されたプレイヤーデータ）
+var player_data_map : weak_map(player, player_data) = map{}
 
 # プレイヤーのデータを取得する関数（存在しない場合は新規作成）
 GetOrCreatePlayerData(p : player):player_data =
@@ -114,12 +150,12 @@ GetOrCreatePlayerData(p : player):player_data =
         }
     }
 
-# プレイヤーのデータを取得する関数（存在しない場合は (ダミー, false) を返す）
-GetPlayerData(p : player):(player_data, logic) =
+# プレイヤーのデータを取得する関数（存在しない場合は none を返す）
+GetPlayerData(p : player):?player_data =
     if (existing := player_data_map[p]) {
-        (existing, true)
+        option{existing}
     } else {
-        (player_data{}, false)
+        false
     }
 
 # プレイヤーのデータを削除する関数（プレイヤーが離脱した時など）

@@ -33,12 +33,12 @@ hud_device := class(creative_device):
     
     # プレイヤーのHUDを更新
     UpdatePlayerHUD(player_agent : agent):void =
-        # プレイヤーデータを取得（GetPlayerData は (player_data, logic) を返す。found が true のときのみ data を使用）
-        # if (data, found := GetPlayerData(player_agent)), found:
-        #     UpdateGoldDisplay(player_agent, data.GetGold())
-        #     UpdateHPDisplay(player_agent, data.GetCurrentHP(), data.GetMaxHP())
-        #     UpdateLevelDisplay(player_agent, data.GetLevel())
-        #     UpdateExperienceDisplay(player_agent, data.GetExperience(), data.GetExperienceToNextLevel())
+        # プレイヤーデータを取得（GetPlayerData は ?player_data を返す）
+        # if (data := GetPlayerData(player_agent)?):
+        #     UpdateGoldDisplay(player_agent, data.gold)
+        #     UpdateHPDisplay(player_agent, data.current_hp, data.max_hp)
+        #     UpdateLevelDisplay(player_agent, data.level)
+        #     UpdateExperienceDisplay(player_agent, data.experience, data.experience_to_next_level)
         
         Print("HUD updated for player")
     

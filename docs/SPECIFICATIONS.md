@@ -7,44 +7,47 @@
 ### 1.1 player_data クラス
 
 ```verse
-player_data := class:
+player_data := class<final><persistable>:
+    # バージョン管理（スキーマ変更時の互換性確認用）
+    Version : int = 1
+    
     # 経済データ
-    var gold : int = 0
-    var total_gold_earned : int = 0
+    gold : int = 0
+    total_gold_earned : int = 0
     
     # RPGデータ
-    var level : int = 1
-    var experience : int = 0
-    var experience_to_next_level : int = 100
+    level : int = 1
+    experience : int = 0
+    experience_to_next_level : int = 100
     
     # ステータスデータ
-    var max_hp : int = 100
-    var current_hp : int = 100
-    var base_attack : int = 10
-    var base_defense : int = 5
-    var base_speed : int = 100
+    max_hp : int = 100
+    current_hp : int = 100
+    base_attack : int = 10
+    base_defense : int = 5
+    base_speed : int = 100
     
     # クラスデータ
-    var player_class : int = 0  # 0: Knight, 1: Mage, 2: Hunter
+    player_class : int = 0  # 0: Knight, 1: Mage, 2: Hunter
     
     # 建設データ
-    var unlocked_buildings : []int = []
+    unlocked_buildings : []int = array{}
     
     # バフデータ
-    var active_buffs : []buff_data = []
+    active_buffs : []buff_data = array{}
     
     # タイムスタンプ
-    var last_gold_update_time : float = 0.0
+    last_gold_update_time : float = 0.0
 ```
 
 ### 1.2 buff_data クラス
 
 ```verse
-buff_data := class:
-    var buff_type : int = 0  # 0: Attack, 1: Speed, 2: HP Regen, etc.
-    var buff_value : int = 0  # バフの値（パーセンテージまたは固定値）
-    var duration : float = 0.0  # 持続時間（秒）、0.0は永続
-    var start_time : float = 0.0  # 開始時刻
+buff_data := class<final><persistable>:
+    buff_type : int = 0  # 0: Attack, 1: Speed, 2: HP Regen, etc.
+    buff_value : int = 0  # バフの値（パーセンテージまたは固定値）
+    duration : float = 0.0  # 持続時間（秒）、0.0は永続
+    start_time : float = 0.0  # 開始時刻
 ```
 
 ### 1.3 building_data クラス

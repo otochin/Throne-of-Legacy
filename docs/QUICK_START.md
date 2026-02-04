@@ -8,9 +8,10 @@
 
 **開発を進める前に、必ず UEFN Verse の公式ドキュメントを参照してください。**
 
-- **[Verse API Reference](https://dev.epicgames.com/documentation/ja-jp/uefn/verse-api-reference)**（Verse API リファレンス）
-- [Verse Language Reference](https://dev.epicgames.com/documentation/en-us/uefn/verse-language-reference-in-unreal-editor-for-fortnite)（Verse 言語リファレンス）
-- [UEFN Documentation](https://dev.epicgames.com/documentation/en-us/uefn)（UEFN ドキュメント）
+- **まとめ**: リンク一覧は **`docs/UEFN_VERSE_REFERENCE.md`** に記載しています。
+- **Verse API Reference（公式）**: https://dev.epicgames.com/documentation/en-us/uefn/verse-api-reference
+- **Verse Language Reference**: [verse-language-reference](https://dev.epicgames.com/documentation/en-us/uefn/verse-language-reference-in-unreal-editor-for-fortnite)
+- **UEFN Documentation**: [uefn](https://dev.epicgames.com/documentation/en-us/uefn)
 
 Verse の構文・型・API は公式仕様に従い、実装やコード生成時は上記ドキュメントを優先して参照すること。
 

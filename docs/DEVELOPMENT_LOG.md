@@ -4,7 +4,7 @@
 
 ## 開発状況サマリー
 
-**最終更新日**: 2026年2月3日
+**最終更新日**: 2026年2月4日
 
 ### 現在のフェーズ
 - **Phase 1: 王室の財政** - 実装中
@@ -22,16 +22,14 @@
 - [x] VFX/サウンドシステムの実装（`Content/Systems/vfx_sound_system.verse`）
 
 ### 進行中のタスク
-- [ ] **コンパイルエラー 3101 の解消**（現時点のブロッカー）
 - [ ] Phase 1のテストとデバッグ
-- [ ] UEFNエディタでの動作確認
+- [ ] UEFNエディタでの動作確認（ゴールド加算ロジックの実装と確認）
 
 ### 次のステップ
-1. **最優先**: Script error 3101 を解消する（下記「未解決のコンパイルエラー」参照）
-2. コンパイル通過後: UEFNエディタでMutator Zoneを設定
-3. デバイスをレベルに配置してテスト
-4. ゴールド生成・HUD表示の動作確認
-5. Phase 2の実装準備
+1. Mutator Zone内プレイヤー取得ロジックとゴールド加算処理の実装（`UpdateGoldForPlayersInZone` → `GenerateGoldFromThroneZone` の連携）
+2. HUDでのゴールド表示・ログ表示の強化（必要に応じて Verse UI API を利用）
+3. テスト結果を踏まえた仕様書の微修正（必要なら）
+4. Phase 2の実装準備
 
 ---
 
@@ -116,8 +114,8 @@ Content/
 
 ### データ構造
 - すべての数値計算は整数（int）で処理（浮動小数点誤差を避けるため）
-- プレイヤーデータは `map(player, player_data)` で管理（`weak_map` は未実装・persistable 制約のため `map` を使用）
-- オプション取得は `GetPlayerData` が `(player_data, logic)` を返す形式で表現
+- プレイヤーデータは `weak_map(player, player_data)` で管理し、`player_data` は `class<final><persistable>` として永続化可能な構造に統一
+- オプション取得は `GetPlayerData` が `?player_data`（option 型）を返す形式で表現
 - セーブデータは `persistence` モジュールを使用（将来実装）
 
 ### モジュール設計
@@ -129,23 +127,11 @@ Content/
 
 ## 既知の問題・課題
 
-### 未解決のコンパイルエラー（2026年2月3日時点）
+### 機能面の未実装・改善ポイント（2026年2月4日時点）
 
-**Script error 3101: Markup content from string is not yet supported.**
-
-| ファイル | 位置 | 内容 |
-|----------|------|------|
-| `Content/Systems/player_data.verse` | 11行目, 27列目 | 該当行: `buff_data := class:` の直上コメント付近 |
-| `Content/Devices/throne_zone_device.verse` | 12行目, 36列目 | 該当行: `player_data_simple := class:` の直上コメント付近 |
-
-**試した対応（いずれもエラー継続）**
-- `class<<final>><<persistable>>` のマークアップを削除し、通常の `class:` に変更
-- 該当付近のコメントから全角括弧「（）」を削除し、コメントを簡略化
-
-**明日以降の調査候補**
-- Verse / UEFN 公式ドキュメントで「3101」「Markup content from string」を検索
-- 該当行・列を空にする、コメントを完全に削除するなど、さらに切り詰めた再現テスト
-- UEFN / Verse のバージョン差異や既知の不具合の有無を確認
+- Mutator Zone 内プレイヤーの取得ロジックが未実装のため、`Throne Zone: Updating gold for players in zone` まではログ出力されるが、実際のゴールド加算は行われていない
+- HUD は現在 Print ベースのデバッグ表示のみで、実際の UI Widget 表示は未実装
+- `GenerateGoldFromThroneZone` / `RewardGoldForEnemyKill` の戻り値（更新済み `player_data`）を `weak_map` に反映する処理が未実装
 
 ---
 
@@ -241,3 +227,17 @@ Content/
 
 - **ドキュメント更新**
   - `docs/QUICK_START.md`: コンパイルエラーとUEFN側オブジェクトの関係を追記（エラーはコード修正で解消、オブジェクト配置はコンパイル通過後）
+
+### 2026年2月4日
+
+- **コンパイルエラー対応完了**
+  - `player_data.verse` / `throne_zone_device.verse` で発生していた Script error 3101 を、クラス宣言のマークアップ修正（`class<final><persistable>`）により解消
+  - `player_data_map` を `weak_map(player, player_data)` に変更し、`player_data` を `class<final><persistable>` とすることでモジュールスコープの永続変数要件を満たすように修正
+  - `GetPlayerData` の戻り値を `(player_data, logic)` から `?player_data` に変更し、option 型ベースの設計に統一
+  - `economy_system.verse` を更新し、`GenerateGoldFromThroneZone` / `RewardGoldForEnemyKill` が更新済み `player_data` を戻り値として返す関数として定義
+
+- **UEFN 側セットアップと動作確認**
+  - コンテンツドロワーから「仕掛け > ミューテーターゾーン」をレベルに配置し、玉座エリアとして設定
+  - `throne_zone_device.verse` / `hud_ui.verse` の Verse クラスをレベルにドラッグ＆ドロップして Verse Device を配置
+  - プレイ中にログタブで `Throne Zone Device: Initialized` および `Throne Zone: Updating gold for players in zone` が 1秒ごとに出力されることを確認
+  - これにより Phase 1 の「コードが動き、デバイスがループ動作している」状態までは到達済み（今後は実際のゴールド加算ロジックを追加予定）

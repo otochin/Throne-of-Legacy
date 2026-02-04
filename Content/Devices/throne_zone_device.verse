@@ -23,7 +23,7 @@ player_data_simple := class:
 throne_zone_device := class(creative_device):
     
     # プレイヤーデータマップ（値型は persistable、組み込み weak_map 参照は未実装のため map を使用）
-    var player_data_map : map(player, player_data_simple) = map{}
+    var player_data_map : [player]player_data_simple = map{}
     
     # デバイス開始時の処理
     OnBegin<override>()<suspends>:void=
